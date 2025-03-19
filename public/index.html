@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Downloader - Sans Filigrane</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0A1D37, #1E3A8A);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(10, 29, 55, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 550px;
+            width: 90%;
+        }
+        h1 {
+            font-size: 2.2em;
+            color: #00C4FF;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #1E3A8A;
+            color: #fff;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #00C4FF, #007BFF);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(45deg, #007BFF, #00C4FF);
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+        video {
+            max-width: 100%;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TikTok Downloader</h1>
+        <input id="videoUrl" placeholder="Collez le lien TikTok ici">
+        <button onclick="downloadTikTok()">Télécharger</button>
+        <div id="result"></div>
+        <video id="preview" controls></video>
+    </div>
+
+    <script>
+        async function downloadTikTok() {
+            const url = document.getElementById('videoUrl').value.trim();
+            const result = document.getElementById('result');
+            const preview = document.getElementById('preview');
+            result.innerHTML = "Analyse en cours...";
+            preview.style.display = 'none';
+
+            if (!url) {
+                result.innerHTML = "Veuillez entrer un lien TikTok valide.";
+                return;
+            }
+
+            try {
+                const response = await fetch('/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform: "tiktok", url })
+                });
+                const data = await response.json();
+
+                if (data.downloadUrl) {
+                    result.innerHTML = `<a href="${data.downloadUrl}" download="tiktok_video.mp4">Télécharger la vidéo</a>`;
+                    preview.src = data.downloadUrl;
+                    preview.style.display = 'block';
+                } else {
+                    result.innerHTML = "Erreur : impossible de récupérer la vidéo.";
+                }
+            } catch (error) {
+                result.innerHTML = "Erreur : vérifiez le lien ou votre connexion.";
+            }
+        }
+    </script>
+</body>
+</html>
